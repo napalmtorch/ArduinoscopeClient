@@ -22,7 +22,7 @@ namespace ArduinoscopeClient
         public static SerialPort  Serial      { get; private set; } = null;
         public static List<IOPin> Pins        { get; private set; } = new List<IOPin>();
 
-        public static int BufferSize = 2048;
+        public static int BufferSize = 1024;
 
         private static bool   _running = false;
         public static bool    _paused  = false;
@@ -75,24 +75,9 @@ namespace ArduinoscopeClient
 
             while (_running)
             {
-                /*
-                if (Serial.BytesToRead > 0)
-                {
-                    char c = (char)Serial.ReadChar();
-                    if (_paused) { continue; }
-                    if (c == 0) { continue; }                    
-                    if (c == '\n')
-                    {
-                        if (_input.Length > 0) 
-                        {
-                            LastInput = _input;
-                        }
-                        _input = "";
-                    }
-                    else { _input += c; }
-                }
-                */
+
             }
+
             if (Serial.IsOpen) { Serial.Close(); }
             Debug.Info("Disconnected serial " + PortName);
         }

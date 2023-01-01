@@ -13,6 +13,8 @@ namespace ArduinoscopeClient
     public static class ControlPanel
     {
         public static Point Size { get { return new Point(400, 440); } }
+        public static bool  IsHovering { get; private set; }
+        public static bool  IsActive { get; private set; }
 
         private static string _selpin  = "";
         private static string _name    = "";
@@ -46,8 +48,12 @@ namespace ArduinoscopeClient
             BeginComboBaudRate();
 
             ImGui.LabelText("Serial Input", IOController.LastInput);
+            ImGui.LabelText("", "HOVER: " + IsHovering.ToString() + ", ACTIVE: " + IsActive.ToString());
 
             BeginPinManager();
+
+            IsHovering = ImGui.IsAnyItemHovered() | ImGui.IsWindowHovered(ImGuiHoveredFlags.AnyWindow);
+            IsActive = ImGui.IsAnyItemActive();
 
             ImGui.End();
 

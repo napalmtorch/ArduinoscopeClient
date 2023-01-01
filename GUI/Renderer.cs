@@ -13,14 +13,13 @@ namespace ArduinoscopeClient
         public static void DrawGrid(int w, int h, int grid_sz, int thickness, Color color)
         {
             for (int i = 0; i < w; i += grid_sz)
-            {
-                Client.SpriteBatch.Draw(Client.Pixel, new Rectangle(i, 0, thickness, h), color);
-            }
+            { Client.SpriteBatch.Draw(Client.Pixel, new Rectangle(i, 0, thickness, h), color); }
 
             for (int i = 0; i < h; i += grid_sz)
-            {
-                Client.SpriteBatch.Draw(Client.Pixel, new Rectangle(0, i, w, thickness), color);
-            }
+            { Client.SpriteBatch.Draw(Client.Pixel, new Rectangle(0, i, w, thickness), color); }
+
+            Client.SpriteBatch.Draw(Client.Pixel, new Rectangle(w, 0, thickness, h), color);
+            Client.SpriteBatch.Draw(Client.Pixel, new Rectangle(0, h, w, thickness), color);
         }
 
         public static void DrawLine(Vector2 point1, Vector2 point2, Color color, float thickness = 1f)
@@ -37,7 +36,7 @@ namespace ArduinoscopeClient
             Client.SpriteBatch.Draw(Client.Pixel, point, null, color, angle, origin, scale, SpriteEffects.None, 0);
         }
 
-        public static void DrawLines()
+        public static void DrawLines(float thickness)
         {
             for (int p = 0; p < IOController.Pins.Count; p++)
             {
@@ -51,7 +50,7 @@ namespace ArduinoscopeClient
                     k++;
                     int x1 = (int)(i * (IOController.BufferSize - 1) / (w - 1));
                     int y1 = GetY(IOController.Pins[p].ValueNormals[k] * IOController.Pins[p].Scale);
-                    DrawLine(new Vector2(x0, y0), new Vector2(x1, y1), IOController.Pins[p].Color, 1);
+                    DrawLine(new Vector2(x0, y0), new Vector2(x1, y1), IOController.Pins[p].Color, thickness);
                     x0 = x1;
                     y0 = y1;
                 }
@@ -60,7 +59,8 @@ namespace ArduinoscopeClient
 
         public static int GetY(float val)
         {
-            return (int)(val * (float)Client.Form.Size.Y);
+            int v = (int)(val * (float)IOController.BufferSize);
+            return (IOController.BufferSize - v - 1);
         }
     }
 }

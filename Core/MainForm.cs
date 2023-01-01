@@ -14,6 +14,8 @@ namespace ArduinoscopeClient
         public Camera  Camera;
         public Vector2 Position;
 
+        private int _scroll;
+
         public MainForm()
         {
             Client.GraphicsMgr = new GraphicsDeviceManager(this);
@@ -49,6 +51,7 @@ namespace ArduinoscopeClient
             Client.Pixel.SetData(new Color[] { Color.White });
 
             Camera = new Camera();
+            Position = new Vector2((IOController.BufferSize / 2), (IOController.BufferSize / 2));
 
             ControlPanel.Initialize();
         }
@@ -61,11 +64,19 @@ namespace ArduinoscopeClient
 
         protected override void Update(GameTime gameTime)
         {
-            KeyboardState kb = Keyboard.GetState();
-            if (kb.IsKeyDown(Keys.W)) { Position.Y -= 500.0f * Client.Delta; }
-            if (kb.IsKeyDown(Keys.S)) { Position.Y += 500.0f * Client.Delta; }
-            if (kb.IsKeyDown(Keys.A)) { Position.X -= 500.0f * Client.Delta; }
-            if (kb.IsKeyDown(Keys.D)) { Position.X += 500.0f * Client.Delta; }
+            if (!ControlPanel.IsActive)
+            {
+                KeyboardState kb = Keyboard.GetState();
+                if (kb.IsKeyDown(Keys.W)) { Position.Y -= 500.0f * Client.Delta; }
+                if (kb.IsKeyDown(Keys.S)) { Position.Y += 500.0f * Client.Delta; }
+                if (kb.IsKeyDown(Keys.A)) { Position.X -= 500.0f * Client.Delta; }
+                if (kb.IsKeyDown(Keys.D)) { Position.X += 500.0f * Client.Delta; }
+
+                MouseState ms = Mouse.GetState();
+                if (ms.ScrollWheelValue < _scroll) { Camera.Zoom -= 0.025f; }
+                if (ms.ScrollWheelValue > _scroll) { Camera.Zoom += 0.025f; }
+                _scroll = ms.ScrollWheelValue;
+            }
 
             ControlPanel.Update(gameTime);
             Camera.Update(Position);
@@ -76,9 +87,14 @@ namespace ArduinoscopeClient
         {
             GraphicsDevice.Clear(Color.Black);
 
-            Client.SpriteBatch.Begin(transformMatrix: Camera.Transform, samplerState: SamplerState.PointClamp);
-            Renderer.DrawGrid(IOController.BufferSize, IOController.BufferSize, 64, 1, Color.White * 0.5f);
-            Renderer.DrawLines();
+            Client.SpriteBatch.Begin(transformMatrix: Camera.Transform, samplerState: (Camera.Zoom < 1.0f ? SamplerState.AnisotropicWrap : SamplerState.PointClamp));
+
+            float thickness = (Camera.Zoom < 1.0f ? (1.0f / (Camera.Zoom) * 2) : 1);
+            Renderer.DrawGrid(IOController.BufferSize, IOController.BufferSize, 64, (int)thickness, Color.Gray);
+            Renderer.DrawLines(thickness);
+            Client.SpriteBatch.End();
+
+            Client.SpriteBatch.Begin();
             Client.SpriteBatch.DrawString(Client.Font, "FPS:" + Client.FPS + "  Frametime:" + (Client.DeltaTimed * 1000.0f) + "ms", new Vector2(8, 8), Color.Orange);
             Client.SpriteBatch.End();
 

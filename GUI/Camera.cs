@@ -23,7 +23,7 @@ namespace ArduinoscopeClient
         {
             Position = Vector2.Zero;
             Transform = new Matrix();
-            Zoom = 1.0f;
+            Zoom = 0.5f;
             Smoothness = 4.0f;
             Angle = 1.0f;
             Rotation = 0.0f;
