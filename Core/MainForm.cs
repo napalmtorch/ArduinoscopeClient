@@ -73,8 +73,8 @@ namespace ArduinoscopeClient
                 if (kb.IsKeyDown(Keys.D)) { Position.X += 500.0f * Client.Delta; }
 
                 MouseState ms = Mouse.GetState();
-                if (ms.ScrollWheelValue < _scroll) { Camera.Zoom -= 0.025f; }
-                if (ms.ScrollWheelValue > _scroll) { Camera.Zoom += 0.025f; }
+                if (ms.ScrollWheelValue < _scroll) { Camera.Zoom -= 0.066f; }
+                if (ms.ScrollWheelValue > _scroll) { Camera.Zoom += 0.066f; }
                 _scroll = ms.ScrollWheelValue;
             }
 

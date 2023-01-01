@@ -84,7 +84,7 @@ namespace ArduinoscopeClient
 
         private static void OnDataReceived(object sender, SerialDataReceivedEventArgs e)
         {
-            if (!_running || Serial == null || !Serial.IsOpen) { return; }
+            if (!_running || _paused || Serial == null || !Serial.IsOpen) { return; }
             _reading = true;
             string str = Serial.ReadLine();
             LastInput = str;
@@ -93,7 +93,7 @@ namespace ArduinoscopeClient
                 int pin = 0;
                 string pin_str = str.Substring(1, str.IndexOf(':') - 1);
                 int.TryParse(pin_str, out pin);
-                if (GetPinIndex(pin) < 0 || GetPinIndex(pin) >= Pins.Count) { return; }
+                if (GetPinIndex(pin) < 0 || GetPinIndex(pin) >= Pins.Count) { _reading = false; return; }
 
                 int val = 0;
                 string val_str = str.Substring(str.IndexOf(':') + 1);
