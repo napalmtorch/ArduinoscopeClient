@@ -2,5 +2,5 @@
 if [ "$EUID" -ne 0 ]
   then echo "Please run as root"
 else
- dotnet run
+ sudo dotnet run
 fi
