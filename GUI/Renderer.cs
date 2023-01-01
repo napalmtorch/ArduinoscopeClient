@@ -48,12 +48,24 @@ namespace ArduinoscopeClient
                 for (int i = 1; i < w; i++)
                 {
                     k++;
-                    int x1 = (int)(((i * (IOController.BufferSize - 1) / (w - 1)) * spd) - (w * (spd - 1)));
+                    int x1 = (int)(((i * (IOController.BufferSize - 1) / (w - 1)) * spd) - (w * spd)) + w;
                     int y1 = GetY(IOController.Pins[p].ValueNormals[k] * IOController.Pins[p].Scale);
                     if (x0 > 0 && x0 < IOController.BufferSize) { DrawLine(new Vector2(x0, y0), new Vector2(x1, y1), IOController.Pins[p].Color, thickness); }
                     x0 = x1;
                     y0 = y1;
                 }
+            }
+        }
+
+        public static void DrawLabels()
+        {
+            float zoom = Client.Form.Camera.Zoom;
+            for (int p = 0; p < IOController.Pins.Count; p++)
+            {
+                float avg = IOController.Pins[p].GetAverage();
+                int ty = (int)(GetY(avg * IOController.Pins[p].Scale));
+                Vector2 txtsz = Client.Font.MeasureString(IOController.Pins[p].Name);
+                Client.SpriteBatch.DrawString(Client.Font, IOController.Pins[p].Name, new Vector2(-((txtsz.X * (1.0f / zoom)) + 8), ty - ((txtsz.Y / 2) * (1.0f / zoom))), IOController.Pins[p].Color, 0, Vector2.Zero, 1.0f / zoom, SpriteEffects.None, 0.0f);
             }
         }
 

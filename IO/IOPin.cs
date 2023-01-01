@@ -39,5 +39,13 @@ namespace ArduinoscopeClient
             Values       = new int[count];
             ValueNormals = new float[count];
         }
+
+        public float GetAverage()
+        {
+            float avg = 0;
+            foreach (float vn in ValueNormals) { avg += vn; }
+            avg /= ValueNormals.Length;
+            return avg;
+        }
     }
 }
