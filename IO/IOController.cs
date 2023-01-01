@@ -20,7 +20,10 @@ namespace ArduinoscopeClient
         public static bool        IsPaused    { get { return _paused; } }
         public static Thread      Thread      { get; private set; } = null;
         public static SerialPort  Serial      { get; private set; } = null;
-        public static List<IOPin> Pins        { get; private set; } = new List<IOPin>();
+        public static List<IOPin> Pins        { get; private set; } = new List<IOPin>()
+        {
+            new IOPin("A0", 54, IOPinType.Analog, 1024, 1.0f, Color.Red, 1024, false),
+        };
 
         public static int BufferSize = 1024;
 

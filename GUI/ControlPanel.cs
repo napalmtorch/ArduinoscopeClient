@@ -15,14 +15,16 @@ namespace ArduinoscopeClient
         public static Point Size { get { return new Point(400, 440); } }
         public static bool  IsHovering { get; private set; }
         public static bool  IsActive { get; private set; }
+        public static float Speed { get { return _speed; } }
 
-        private static string _selpin  = "";
-        private static string _name    = "";
-        private static int    _pin     = 0;
-        private static int    _max     = 0;
-        private static float  _scale   = 0;
-        private static bool   _digital = false;
-        private static bool   _pullup  = false;
+        private static string _selpin   = "";
+        private static string _name     = "";
+        private static int    _pin      = 0;
+        private static int    _max      = 0;
+        private static float  _scale    = 1.0f;
+        private static float  _speed    = 1.0f;
+        private static bool   _digital  = false;
+        private static bool   _pullup   = false;
 
         private static SVEC4  _color   = new SVEC4(1.0f, 1.0f, 1.0f, 1.0f);
 
@@ -47,8 +49,7 @@ namespace ArduinoscopeClient
             BeginComboPortName();
             BeginComboBaudRate();
 
-            ImGui.LabelText("Serial Input", IOController.LastInput);
-            ImGui.LabelText("", "HOVER: " + IsHovering.ToString() + ", ACTIVE: " + IsActive.ToString());
+            if (ImGui.SliderFloat("Multiplier", ref _speed, 0.001f, 10.0f)) { }
 
             BeginPinManager();
 

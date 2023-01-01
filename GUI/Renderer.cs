@@ -36,7 +36,7 @@ namespace ArduinoscopeClient
             Client.SpriteBatch.Draw(Client.Pixel, point, null, color, angle, origin, scale, SpriteEffects.None, 0);
         }
 
-        public static void DrawLines(float thickness)
+        public static void DrawLines(float thickness, float spd)
         {
             for (int p = 0; p < IOController.Pins.Count; p++)
             {
@@ -48,9 +48,9 @@ namespace ArduinoscopeClient
                 for (int i = 1; i < w; i++)
                 {
                     k++;
-                    int x1 = (int)(i * (IOController.BufferSize - 1) / (w - 1));
+                    int x1 = (int)(((i * (IOController.BufferSize - 1) / (w - 1)) * spd) - (w * (spd - 1)));
                     int y1 = GetY(IOController.Pins[p].ValueNormals[k] * IOController.Pins[p].Scale);
-                    DrawLine(new Vector2(x0, y0), new Vector2(x1, y1), IOController.Pins[p].Color, thickness);
+                    if (x0 > 0 && x0 < IOController.BufferSize) { DrawLine(new Vector2(x0, y0), new Vector2(x1, y1), IOController.Pins[p].Color, thickness); }
                     x0 = x1;
                     y0 = y1;
                 }

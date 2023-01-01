@@ -91,7 +91,7 @@ namespace ArduinoscopeClient
 
             float thickness = (Camera.Zoom < 1.0f ? (1.0f / (Camera.Zoom) * 2) : 1);
             Renderer.DrawGrid(IOController.BufferSize, IOController.BufferSize, 64, (int)thickness, Color.Gray);
-            Renderer.DrawLines(thickness);
+            Renderer.DrawLines(thickness, ControlPanel.Speed);
             Client.SpriteBatch.End();
 
             Client.SpriteBatch.Begin();
