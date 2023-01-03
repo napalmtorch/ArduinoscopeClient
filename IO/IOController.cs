@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.IO.Ports;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,10 +21,7 @@ namespace ArduinoscopeClient
         public static bool        IsPaused    { get { return _paused; } }
         public static Thread      Thread      { get; private set; } = null;
         public static SerialPort  Serial      { get; private set; } = null;
-        public static List<IOPin> Pins        { get; private set; } = new List<IOPin>()
-        {
-            new IOPin("A0", 54, IOPinType.Analog, 1024, 1.0f, Color.Red, 1024, false),
-        };
+        public static List<IOPin> Pins { get; private set; } = new List<IOPin>();
 
         public static int BufferSize = 1024;
 
@@ -120,6 +118,49 @@ namespace ArduinoscopeClient
                 else { Serial.Write(Pins[i].Type == IOPinType.Analog ? "+A" : "+d"); }
                 Serial.Write(Pins[i].Pin + "\n");
             }
+            Debug.Info("Sent pin configuration to device");
+        }
+
+        public static void SavePinConfiguration(string fname)
+        {
+            List<string> lines = new List<string>();
+
+            lines.Add("CFG," + PortName + "," + BaudRate + "," + ControlPanel.Speed);
+
+            foreach (var pin in Pins)
+            {
+                lines.Add(pin.Serialize());
+            }
+            File.WriteAllLines(fname, lines.ToArray());
+            Debug.OK("Saved pin configuration to '" + fname + "'");
+        }
+
+        public static void LoadPinConfiguration(string fname)
+        {
+            if (!File.Exists(fname)) { Debug.Error("Unable to locate pin configuration file at '" + fname + "'"); return; }
+            string[] lines = File.ReadAllLines(fname);
+
+            Pins.Clear();
+            foreach (string line in lines)
+            {
+                if (line.StartsWith("PIN,"))
+                {
+                    IOPin pin = new IOPin();
+                    pin.Deserialize(line);
+                    pin.Resize(BufferSize);
+                    Pins.Add(pin);
+                }
+                else if (line.StartsWith("CFG,"))
+                {
+                    string[] parts = line.Split(',');
+                    if (parts.Length != 4) { Debug.Error("Invalid argument count while reading pin configuration"); return; }
+                    if (!int.TryParse(parts[2], out BaudRate)) { Debug.Error("Error while parsing baud rate in configuration"); return; }
+                    if (!float.TryParse(parts[3], out ControlPanel.Speed)) { Debug.Error("Error while parsing speed multiplier in cofiguration"); return; }
+                    PortName = parts[1];
+                }
+            }
+            Debug.OK("Loaded pin configuration from '" + fname + "'");
+            SendPinConfiguration();
         }
 
         public static void PushValue(int pin_index, int raw, float value)

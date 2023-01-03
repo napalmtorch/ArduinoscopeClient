@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.IO.Ports;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,17 +13,17 @@ namespace ArduinoscopeClient
 {
     public static class ControlPanel
     {
-        public static Point Size { get { return new Point(400, 440); } }
+        public static Point Size { get { return new Point(400, 480); } }
         public static bool  IsHovering { get; private set; }
         public static bool  IsActive { get; private set; }
-        public static float Speed { get { return _speed; } }
+        public static float Speed;
 
         private static string _selpin   = "";
         private static string _name     = "";
+        private static string _filename = "default.cfg";
         private static int    _pin      = 0;
         private static int    _max      = 0;
         private static float  _scale    = 1.0f;
-        private static float  _speed    = 1.0f;
         private static bool   _digital  = false;
         private static bool   _pullup   = false;
 
@@ -32,6 +33,8 @@ namespace ArduinoscopeClient
         {
             IOController.PortName = (SerialPort.GetPortNames().Length > 0 ? SerialPort.GetPortNames()[0] : "");
             IOController.BaudRate = 9600;
+
+            if (File.Exists("default.cfg")) { IOController.LoadPinConfiguration("default.cfg"); }
         }
 
         public static void Update(GameTime gt)
@@ -49,7 +52,7 @@ namespace ArduinoscopeClient
             BeginComboPortName();
             BeginComboBaudRate();
 
-            if (ImGui.SliderFloat("Multiplier", ref _speed, 0.001f, 10.0f)) { }
+            if (ImGui.SliderFloat("Multiplier", ref Speed, 0.001f, 10.0f)) { }
 
             BeginPinManager();
 
@@ -198,6 +201,14 @@ namespace ArduinoscopeClient
                     IOController.SendPinConfiguration();
                 }
             }
+
+            ImGui.NewLine();
+            if (ImGui.InputText("File", ref _filename, 512, ImGuiInputTextFlags.EnterReturnsTrue)) { }
+
+            if (ImGui.Button("Save")) { IOController.SavePinConfiguration(_filename); }
+
+            ImGui.SameLine();
+            if (ImGui.Button("Load")) { IOController.LoadPinConfiguration(_filename); }
         }
 
         private static void SelectedPinChanged()
